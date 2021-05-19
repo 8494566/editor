@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="Editor">
+    <file>img/asve.png</file>
+    <file>img/new.png</file>
+    <file>img/open.png</file>
+    <file>img/print.png</file>
+    <file>img/retracement.png</file>
+    <file>img/rollback.png</file>
+    <file>img/saveAs.png</file>
+    <file>img/down_triangle.png</file>
+    <file>img/leftarrow.png</file>
+    <file>img/RCDATA_32.png</file>
+    <file>img/scrollbarbg.png</file>
+    <file>img/up_triangle.png</file>
+    <file>img/yjks.ico</file>
+  </qresource>
+</RCC>
