@@ -1,4 +1,4 @@
-#include "Suspendedscrollbar.h"
+#include "SuspendedScrollBar.h"
 #include <QFile>
 
 SuspendedScrollBar::SuspendedScrollBar(Qt::Orientation t ,  QWidget *parent) : QScrollBar(parent){
