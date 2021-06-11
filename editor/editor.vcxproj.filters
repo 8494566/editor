@@ -21,11 +21,11 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
+    <Filter Include="Rewrite Class">
+      <UniqueIdentifier>{33722464-fb5f-400e-bd30-dbdd3bae8807}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Editor.qrc">
-      <Filter>Resource Files</Filter>
-    </QtRcc>
     <QtUic Include="Editor.ui">
       <Filter>Form Files</Filter>
     </QtUic>
@@ -35,14 +35,39 @@
     <ClCompile Include="Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ResourceCompile Include="$pro_name$.rc">
-    </ResourceCompile>
-    <None Include="$pro_name$.ico">
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollArea.cpp">
+      <Filter>Rewrite Class</Filter>
+    </ClCompile>
+    <ClCompile Include="SuspendedScrollBar.cpp">
+      <Filter>Rewrite Class</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeWidget.cpp">
+      <Filter>Rewrite Class</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="ScrollArea.h">
+      <Filter>Rewrite Class</Filter>
+    </QtMoc>
+    <QtMoc Include="SuspendedScrollBar.h">
+      <Filter>Rewrite Class</Filter>
+    </QtMoc>
+    <QtMoc Include="TreeWidget.h">
+      <Filter>Rewrite Class</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Editor.qrc">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="$pro_name$.def">
-      <Filter>Resource Files</Filter>
-    </None>
-
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scrollbar-horizontal.qss" />
+    <None Include="scrollbar-vertical.qss" />
   </ItemGroup>
 </Project>
