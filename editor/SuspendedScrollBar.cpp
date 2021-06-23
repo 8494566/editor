@@ -1,4 +1,4 @@
-#include "SuspendedScrollBar.h"
+﻿#include "SuspendedScrollBar.h"
 #include <QFile>
 
 SuspendedScrollBar::SuspendedScrollBar(Qt::Orientation t ,  QWidget *parent) : QScrollBar(parent){
@@ -10,6 +10,7 @@ SuspendedScrollBar::SuspendedScrollBar(Qt::Orientation t ,  QWidget *parent) : Q
 		QString style(styleFile.readAll());
 		this->setStyleSheet(style);
 	}
+	styleFile.close();
 
 	this->setRange(0, 0);
 	this->hide();

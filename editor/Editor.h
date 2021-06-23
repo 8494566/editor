@@ -1,4 +1,4 @@
-#ifndef EDITOR_H
+﻿#ifndef EDITOR_H
 #define EDITOR_H
 
 #include <QtWidgets/QMainWindow>
@@ -15,6 +15,8 @@ class Editor : public QMainWindow
 public:
     explicit Editor(QWidget *parent = Q_NULLPTR);
 	~Editor();
+public:
+    bool eventFilter(QObject* watched, QEvent* event);
 private:
     void init();
 public:
@@ -62,6 +64,7 @@ private:
     int m_toolBarButtonState{ 0 };
 private:
     Ui::EditorClass* ui{ new Ui::EditorClass };
+public:
 	std::map<std::string, QDockWidget*> m_mapDocks;
 	std::vector<QDockWidget*> m_docks;
     std::vector<QDockWidget*> m_modelLoadInput;
@@ -88,6 +91,8 @@ private:
     std::vector<QToolButton*> m_toolBarButtons;
     std::vector<QToolButton*> m_prefabricateSplit;
 
+private:
+    void showGraphTest();
 };
 
 #endif // EDITOR_H

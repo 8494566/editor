@@ -1,4 +1,4 @@
-#include "Editor.h"
+﻿#include "Editor.h"
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDockWidget>
@@ -8,8 +8,9 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QScrollArea>
-#include <QtWidgets/QScrollBar>
+#include "LibraryManagers/Plugin/PluginManager.h"
+#include "RenderViewSetting/Interface/RenderViewInterface.h"
+
 #include "TreeWidget.h"
 #include "ScrollArea.h"
 
@@ -24,6 +25,14 @@ Editor::Editor(QWidget *parent)
 Editor::~Editor()
 {
 	delete ui;
+}
+
+bool Editor::eventFilter(QObject* watched, QEvent* event)
+{
+	PluginManager* pm = PluginManager::GetPluginManager();
+	RenderViewInterface* renderView = (RenderViewInterface*)pm->getPlugin("RenderViewSetting");
+	renderView->TestCall();
+	return QMainWindow::eventFilter(watched, event);
 }
 
 void Editor::init()
@@ -87,6 +96,7 @@ void Editor::init()
 	setToolbarButton();
 	setCmdDockWidget();
 	setSelectDockWidget();
+	showGraphTest();
 }
 
 void Editor::removeAllDock()
@@ -212,13 +222,13 @@ void Editor::setMapCompilePonst()
 
 void Editor::setCmdTreeWidgetPonst()
 {	
-	QGridLayout* pLayout = new QGridLayout();
+    QGridLayout* pLayout = new QGridLayout();
 	
 	TreeWidget* treeWidget = new TreeWidget(this);
 	treeWidget->setMinimumSize(QSize(70, 50));
 	pLayout->addWidget(treeWidget);
 
-	setScrollArea(u8"命令树", pLayout);
+    setScrollArea(u8"命令树", pLayout);
 }
 
 void Editor::craeteToolBar()
@@ -303,7 +313,12 @@ void Editor::setButton(QAbstractButton* buttonPtr, const char* tpyeName, const i
 
 	iconLabel->setFixedSize(32, 32);
 	setPonstStyleSheet(iconLabel, "QLabel", iconPonstRow, iconPonstRank);
-	textLabel->setText(buttonText);
+
+	QString strElidedText = textLabel->fontMetrics().elidedText(buttonText, Qt::ElideRight, 50, Qt::TextShowMnemonic);
+	//textLabel->setWordWrap(true);
+	textLabel->setText(strElidedText);
+	textLabel->setToolTip(buttonText);
+
 	// new一个V布局，若想左右放图片和文本，将QVBoxLayout改为QHBoxLayout即可
 	QVBoxLayout* myLayout = new QVBoxLayout(this);
 	myLayout->addSpacing(0);
@@ -311,17 +326,9 @@ void Editor::setButton(QAbstractButton* buttonPtr, const char* tpyeName, const i
 	myLayout->addSpacing(0);
 	myLayout->addWidget(textLabel, 0, Qt::AlignHCenter);
 	myLayout->addStretch();
-	//if (strcmp(tpyeName, "QToolButton") == 0)
-	//{
-	//	QLabel* iconLabel1 = new QLabel;
-	//	iconLabel1->setFixedSize(32, 12);
-	//	iconLabel1->setStyleSheet("QLabel{border-image:url("":/Editor/img/RCDATA_32.png"") 852 416 928 192 0;}");
-	//	myLayout->addWidget(iconLabel1, 0, Qt::AlignHCenter);
-	//	myLayout->addStretch();
-	//	
-	//}
+
 	buttonPtr->setLayout(myLayout);
-	buttonPtr->setStyleSheet(QString("%1{border-image: url("":/Editor/img/RCDATA_32.png"") 608 0 1152 608 0;}"
+	buttonPtr->setStyleSheet(QString("%1{border-image: url("":/Editor/img/RCDATA_32.png"") 608 0 1152 608 0;border-radius:10px;}"
 		"%1:hover{background-color:rgb(204 ,255 ,255);}"
 		"%1:pressed{background-color:rgb(0 ,255 ,255);padding-left:3px;padding-top:3px;}"
 		"%1::menu-indicator{subcontrol-position:bottom center;}").arg(tpyeName));
@@ -334,7 +341,7 @@ void Editor::setDoubleMinButtonGridLayout(QGridLayout* pLayout, std::vector<QToo
 		buttonVector[i] = new QToolButton(this);
 		buttonVector[i]->setMinimumSize(QSize(32, 32));
 		buttonVector[i]->setMaximumSize(QSize(32, 32));
-		buttonVector[i]->setStyleSheet("QToolButton:hover{background-color:rgb(204 ,255 ,255);}"
+		buttonVector[i]->setStyleSheet("QToolButton:hover{background-color:rgb(204 ,255 ,255);border-radius:5px;}"
 			"QToolButton:pressed{background-color:rgb(0 ,255 ,255);padding-left:3px; padding-top:3px;}");
 
 		if (i > (begin + lineFeed - 1))
@@ -366,7 +373,7 @@ void Editor::newDockWidget(std::vector<QDockWidget*>& docks, const std::vector<s
 	{
 		docks[i] = new QDockWidget(this);
 		m_mapDocks.insert(std::pair < std::string, QDockWidget* >(dockNameArr[i], docks[i]));
-		docks[i]->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
+		//docks[i]->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
 		docks[i]->setWindowTitle(dockNameArr[i].c_str());
 	}
 
@@ -399,14 +406,6 @@ void Editor::setScrollArea(const char* dockName, QLayout* layout)
 {
 	QWidget* newWidget = new QWidget(this);
 	newWidget->setLayout(layout);
-	//QScrollArea* scrollArea = new QScrollArea(this);
-	/*scrollArea->setStyleSheet(
-		"QScrollArea {background-color:transparent;}"
-		"QScrollBar:vertical {"
-		"border:0px solid grey;"
-		"width: 0;"
-		"}");
-	scrollArea->viewport()->setStyleSheet("background-color:transparent;");*/
 
 	ScrollArea* scrollArea = new ScrollArea(this);
 	scrollArea->setWidget(newWidget);
@@ -485,7 +484,7 @@ void Editor::setComponentLayoutButton()
 	setButton(m_componentLayout[2], "QToolButton", 4, 6, u8"墙");
 	setButton(m_componentLayout[3], "QToolButton", 4, 12, u8"墙洞");
 	setButton(m_componentLayout[4], "QToolButton", 4, 6, "斜墙");
-	setButton(m_componentLayout[5], "QToolButton", 29, 19, u8" 隔墙\n填充墙");
+	setButton(m_componentLayout[5], "QToolButton", 29, 19, u8"隔墙填充墙");
 	setButton(m_componentLayout[6], "QToolButton", 4, 3, u8"斜杠");
 	setButton(m_componentLayout[7], "QToolButton", 4, 4, u8"次梁");
 	setButton(m_componentLayout[8], "QToolButton", 29, 19, u8"绘墙线");
@@ -496,7 +495,7 @@ void Editor::setComponentLayoutButton()
 	setButton(m_componentLayout[13], "QToolButton", 28, 8, u8"拾取布置");
 	setButton(m_componentLayout[14], "QToolButton", 34, 20, u8"定义刷");
 	setButton(m_componentLayout[15], "QToolButton", 16, 4, u8"导入截面");
-	setButton(m_componentLayout[16], "QToolButton", 6, 4, u8" 墙洞\n转连梁");
+	setButton(m_componentLayout[16], "QToolButton", 6, 4, u8"墙洞转连梁");
 	setButton(m_componentLayout[17], "QToolButton", 16, 17, u8"本层信息");
 	setButton(m_componentLayout[18], "QToolButton", 23, 10, u8"材料");
 	setButton(m_componentLayout[19], "QToolButton", 6, 6, u8"上下对齐");
@@ -522,7 +521,7 @@ void Editor::setComponentLayoutButton()
 	setButton(m_componentLayout[33], "QToolButton", 29, 2, u8"导到空间");
 	setButton(m_componentLayout[34], "QToolButton", 14, 16, u8"漏斗");
 	setButton(m_componentLayout[35], "QToolButton", 48, 3, u8"门式钢架");
-	setButton(m_componentLayout[36], "QToolButton", 46, 6, u8"墙预应\n力钢筋");
+	setButton(m_componentLayout[36], "QToolButton", 46, 6, u8"墙预应力钢筋");
 	setButton(m_componentLayout[37], "QToolButton", 48, 10, u8"石化");
 	setButton(m_componentLayout[38], "QToolButton", 32, 17, u8"基础");
 
@@ -548,22 +547,22 @@ void Editor::setFloorLayoutButton()
 	setButton(m_floorLayout[9], "QToolButton", 4, 11, u8"位置检查");
 	setButton(m_floorLayout[10], "QToolButton", 4, 9, u8"悬挑板");
 	setButton(m_floorLayout[11], "QToolButton", 42, 12, u8"预制阳台");
-	setButton(m_floorLayout[12], "QToolButton", 42, 10, u8" 预制\n空调板");
+	setButton(m_floorLayout[12], "QToolButton", 42, 10, u8"预制空调板");
 	setButton(m_floorLayout[13], "QToolButton", 4, 9, u8"挑檐");
 	setButton(m_floorLayout[14], "QToolButton", 8, 7, u8"删除");
 	setButton(m_floorLayout[15], "QToolButton", 1, 12, u8"层间复制");
 	setButton(m_floorLayout[16], "QToolButton", 39, 11, u8"布空心板");
-	setButton(m_floorLayout[17], "QToolButton", 39, 9, u8"布压形\n 钢板");
+	setButton(m_floorLayout[17], "QToolButton", 39, 9, u8"布压形钢板");
 	setButton(m_floorLayout[18], "QToolButton", 4, 8, u8"定义");
 	setButton(m_floorLayout[19], "QToolButton", 4, 8, u8"布置");
 	setButton(m_floorLayout[20], "QToolButton", 39, 13, u8"修改");
-	setButton(m_floorLayout[21], "QToolButton", 4, 11, u8"预处理\n 布置");
-	setButton(m_floorLayout[22], "QToolButton", 23, 9, u8"叠合板\n 统计");
+	setButton(m_floorLayout[21], "QToolButton", 4, 11, u8"预处理布置");
+	setButton(m_floorLayout[22], "QToolButton", 23, 9, u8"叠合板统计");
 	setButton(m_floorLayout[23], "QToolButton", 42, 14, u8"DWG导入");
 	setButton(m_floorLayout[24], "QToolButton", 42, 5, u8"其他导入");
 	setButton(m_floorLayout[25], "QToolButton", 37, 5, u8"布置柱帽");
 	setButton(m_floorLayout[26], "QToolButton", 37, 5, u8"统一裁剪");
-	setButton(m_floorLayout[27], "QToolButton", 37, 5, u8"自定义\n 裁剪");
+	setButton(m_floorLayout[27], "QToolButton", 37, 5, u8"自定义裁剪");
 	setButton(m_floorLayout[28], "QToolButton", 1, 15, u8"楼板查询");
 
 	setScrollArea(u8"楼板布置", pLayout);
@@ -653,17 +652,17 @@ void Editor::setFloorAssembleButton()
 	setButton(m_floorLayout[7], "QToolButton", 16, 1, u8"删除准层");
 	setButton(m_floorLayout[8], "QToolButton", 1, 11, u8"插入准层");
 	setButton(m_floorLayout[9], "QToolButton", 16, 15, u8"层间编辑");
-	setButton(m_floorLayout[10], "QToolButton", 29, 16, u8"标准层\n 合并");
+	setButton(m_floorLayout[10], "QToolButton", 29, 16, u8"标准层合并");
 	setButton(m_floorLayout[11], "QToolButton", 48, 7, u8"模型检查");
 	setButton(m_floorLayout[12], "QToolButton", 48, 5, u8"计算数检");
 	setButton(m_floorLayout[13], "QToolButton", 38, 1, u8"超限信息");
 	setButton(m_floorLayout[14], "QToolButton", 48, 4, u8"工程对比");
 	setButton(m_floorLayout[15], "QToolButton", 48, 2, u8"对比结果");
 	setButton(m_floorLayout[16], "QToolButton", 49, 12, u8"清理对比");
-	setButton(m_floorLayout[17], "QToolButton", 23, 9, u8"工程量\n 统计");
+	setButton(m_floorLayout[17], "QToolButton", 23, 9, u8"工程量统计");
 	setButton(m_floorLayout[18], "QToolButton", 11, 8, u8"模型链接");
-	setButton(m_floorLayout[19], "QToolButton", 11, 8, u8"隐藏链\n接模型");
-	setButton(m_floorLayout[20], "QToolButton", 11, 8, u8"删除链\n接模型");
+	setButton(m_floorLayout[19], "QToolButton", 11, 8, u8"隐藏链接模型");
+	setButton(m_floorLayout[20], "QToolButton", 11, 8, u8"删除链接模型");
 
 	setScrollArea(u8"楼层组装", pLayout);
 }
@@ -686,7 +685,7 @@ void Editor::setSpatialStructureButton()
 	setButton(m_spatialStructure[8], "QToolButton", 38, 4, u8"MST");
 	setButton(m_spatialStructure[9], "QToolButton", 38, 6, u8"3D3S");
 	setButton(m_spatialStructure[10], "QToolButton", 13, 12, u8"工作基面");
-	setButton(m_spatialStructure[11], "QToolButton", 37, 6, u8"取消工\n作基面");
+	setButton(m_spatialStructure[11], "QToolButton", 37, 6, u8"取消工作基面");
 	setButton(m_spatialStructure[12], "QToolButton", 6, 18, u8"上节点高");
 	setButton(m_spatialStructure[13], "QToolButton", 4, 5, u8"柱");
 	setButton(m_spatialStructure[14], "QToolButton", 4, 1, u8"梁");
@@ -717,7 +716,7 @@ void Editor::setSpatialStructureButton()
 	setButton(m_spatialStructure[34], "QToolButton", 8, 7, u8"构件");
 	setButton(m_spatialStructure[35], "QToolButton", 7, 15, u8"荷载");
 	setButton(m_spatialStructure[36], "QToolButton", 35, 4, u8"自动生成");
-	setButton(m_spatialStructure[37], "QToolButton", 42, 16, u8" 指定\n上下弦");
+	setButton(m_spatialStructure[37], "QToolButton", 42, 16, u8"指定上下弦");
 
 	setScrollArea(u8"空间结构", pLayout);
 }
@@ -791,9 +790,11 @@ void Editor::setToolbarButton()
 void Editor::setCmdDockWidget()
 {
 	QListView* cmdShowCase = new QListView(this);
-	cmdShowCase->setMinimumSize(QSize(500, 90));
+	cmdShowCase->setMinimumSize(QSize(700, 90));
+	cmdShowCase->setMaximumSize(QSize(700, 90));
 	QTextEdit* cmdCallCase = new QTextEdit(this);
-	cmdCallCase->setMinimumSize(QSize(500, 20));
+	cmdCallCase->setMinimumSize(QSize(700, 20));
+	cmdCallCase->setMaximumSize(QSize(700, 20));
 
 	QVBoxLayout* pLayout = new QVBoxLayout(this);
 	pLayout->addSpacing(0);
@@ -863,7 +864,7 @@ void Editor::setSelectDockWidget()
 		selectButtons[i] = new QToolButton(this);
 		selectButtons[i]->setMinimumSize(QSize(32, 32));
 		selectButtons[i]->setMaximumSize(QSize(32, 32));
-		selectButtons[i]->setStyleSheet("QToolButton:hover{background-color:rgb(204 ,255 ,255);}"
+		selectButtons[i]->setStyleSheet("QToolButton:hover{background-color:rgb(204 ,255 ,255);border-radius:5px;}"
 			"QToolButton:pressed{background-color:rgb(0 ,255 ,255);padding-left:3px; padding-top:3px;}");
 		pLayout->addWidget(selectButtons[i], 4, i + 1, 1, 2);
 	}
@@ -883,3 +884,20 @@ void Editor::setSelectDockWidget()
 
 	newWidget->setLayout(pLayout);
 }
+
+void Editor::showGraphTest()
+{
+	//setScrollArea(u8"图形", pLayout);
+	//QWidget* newWidget = new QWidget(this);
+
+	QWidget* widget = m_mapDocks[u8"图形"];
+	PluginManager* pm = PluginManager::GetPluginManager();
+	RenderViewInterface* renderView = (RenderViewInterface*)pm->getPlugin("RenderViewSetting");
+	void* hwnd = renderView->QWidgetToHWND(widget);
+	widget->installEventFilter(this);
+
+	//ScrollArea* scrollArea = new ScrollArea(this);
+	//scrollArea->setWidget(newWidget);
+	//m_mapDocks[u8"图形"]->setWidget(scrollArea);
+}
+

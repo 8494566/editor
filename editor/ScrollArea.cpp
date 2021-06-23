@@ -1,4 +1,4 @@
-#include "ScrollArea.h"
+﻿#include "ScrollArea.h"
 #include "SuspendedScrollBar.h"
 
 

@@ -1,4 +1,4 @@
-#ifndef SUSPENDEDSCROLLBAR_H
+﻿#ifndef SUSPENDEDSCROLLBAR_H
 #define SUSPENDEDSCROLLBAR_H
 
 #include <QScrollBar> 

@@ -1,4 +1,4 @@
-#ifndef SCROLLAREA_H
+﻿#ifndef SCROLLAREA_H
 #define SCROLLAREA_H
 
 #include <QScrollArea> 
