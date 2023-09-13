@@ -1,6 +1,7 @@
-﻿#include "DynLib.h"
+﻿#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include "DynLib.h"
 #include <QLibrary>
-#include <filesystem>
+#include <experimental/filesystem>
 #include "Plugin.h"
 
 namespace fs = std::experimental::filesystem;

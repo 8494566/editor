@@ -1,8 +1,9 @@
-﻿#include "PluginManager.h"
+﻿#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include "PluginManager.h"
 #include <algorithm>
 #include <fstream>
 #include <sstream>
-#include <filesystem>
+#include <experimental/filesystem>
 #include "Plugin.h"
 #include "DynLib.h"
 
